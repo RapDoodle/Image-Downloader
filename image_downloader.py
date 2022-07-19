@@ -4,23 +4,31 @@
 
 from __future__ import print_function
 
-import argparse
-
-import crawler
-import downloader
 import sys
+import argparse
+from concurrent.futures import process
 
+try:
+    from crawler import crawl_image_urls
+    from downloader import download_images
+except:
+    # Import for Image Downloader Plus
+    from core.crawler import crawl_image_urls
+    from core.downloader import download_images
+    pass
 
-def main(argv):
+def get_arg_parser(keywords_required=True):
+    """Expose the arguments to Image Downloader Plus"""
     parser = argparse.ArgumentParser(description="Image Downloader")
-    parser.add_argument("keywords", type=str,
-                        help='Keywords to search. ("in quotes")')
+    if keywords_required:
+        parser.add_argument("keywords", type=str,
+                            help='Keywords to search. ("in quotes")')
     parser.add_argument("--engine", "-e", type=str, default="Google",
                         help="Image search engine.", choices=["Google", "Bing", "Baidu"])
-    parser.add_argument("--driver", "-d", type=str, default="chrome_headless",
+    parser.add_argument("--driver", "-d", type=str, default="chrome",
                         help="Image search engine.", choices=["chrome_headless", "chrome", "phantomjs"])
     parser.add_argument("--max-number", "-n", type=int, default=100,
-                        help="Max number of images download for the keywords.")
+                        help="Maximum number of images to download for the keywords.")
     parser.add_argument("--num-threads", "-j", type=int, default=50,
                         help="Number of threads to concurrently download images.")
     parser.add_argument("--timeout", "-t", type=int, default=20,
@@ -44,27 +52,36 @@ def main(argv):
     # Google: bw, red, orange, yellow, green, teal, blue, purple, pink, white, gray, black, brown
     parser.add_argument("--color", "-cl", type=str, default=None,
                         help="Specify the color of desired images.") 
+    
+    return parser
 
-    args = parser.parse_args(args=argv)
 
-    proxy_type = None
-    proxy = None
+def process_proxy(args):
     if args.proxy_http is not None:
-        proxy_type = "http"
-        proxy = args.proxy_http
+        args.proxy_type = "http"
+        args.proxy = args.proxy_http
     elif args.proxy_socks5 is not None:
-        proxy_type = "socks5"
-        proxy = args.proxy_socks5
+        args.proxy_type = "socks5"
+        args.proxy = args.proxy_socks5
+    else:
+        args.proxy_type = None
+        args.proxy = None
 
-    crawled_urls = crawler.crawl_image_urls(args.keywords,
-                                            engine=args.engine, max_number=args.max_number,
-                                            face_only=args.face_only, safe_mode=args.safe_mode,
-                                            proxy_type=proxy_type, proxy=proxy,
-                                            browser=args.driver, image_type=args.type, color=args.color)
-    downloader.download_images(image_urls=crawled_urls, dst_dir=args.output,
-                               concurrency=args.num_threads, timeout=args.timeout,
-                               proxy_type=proxy_type, proxy=proxy,
-                               file_prefix=args.engine)
+
+def main(argv):
+    parser = get_arg_parser()
+    args = parser.parse_args(args=argv)
+    process_proxy(args)
+
+    crawled_urls = crawl_image_urls(args.keywords,
+                                    engine=args.engine, max_number=args.max_number,
+                                    face_only=args.face_only, safe_mode=args.safe_mode,
+                                    proxy_type=args.proxy_type, proxy=args.proxy,
+                                    browser=args.driver, image_type=args.type, color=args.color)
+    download_images(image_urls=crawled_urls, dst_dir=args.output,
+                    concurrency=args.num_threads, timeout=args.timeout,
+                    proxy_type=args.proxy_type, proxy=args.proxy,
+                    file_prefix=args.engine)
 
     print("Finished.")
 

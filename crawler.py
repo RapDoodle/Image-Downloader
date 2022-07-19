@@ -16,6 +16,7 @@ import shutil
 from urllib.parse import unquote, quote
 from selenium import webdriver
 from selenium.webdriver import DesiredCapabilities
+from selenium.webdriver.common.by import By
 import requests
 from concurrent import futures
 
@@ -24,7 +25,7 @@ if getattr(sys, 'frozen', False):
 else:
     bundle_dir = os.path.dirname(os.path.abspath(__file__))
 
-dcap = dict(DesiredCapabilities.PHANTOMJS)
+dcap = dict(DesiredCapabilities.CHROME)
 dcap["phantomjs.page.settings.userAgent"] = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100"
 )
@@ -70,7 +71,7 @@ def google_image_url_from_webpage(driver, max_number, quiet=False):
     thumb_elements = []
     while True:
         try:
-            thumb_elements = driver.find_elements_by_class_name("rg_i")
+            thumb_elements = driver.find_elements(By.CLASS_NAME, "rg_i")
             my_print("Find {} images.".format(len(thumb_elements)), quiet)
             if len(thumb_elements) >= max_number:
                 break
@@ -79,7 +80,7 @@ def google_image_url_from_webpage(driver, max_number, quiet=False):
             thumb_elements_old = thumb_elements
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
-            show_more = driver.find_elements_by_class_name("mye4qd")
+            show_more = driver.find_elements(By.CLASS_NAME, "mye4qd")
             if len(show_more) == 1 and show_more[0].is_displayed() and show_more[0].is_enabled():
                 my_print("Click show_more button.", quiet)
                 show_more[0].click()
@@ -115,7 +116,7 @@ def google_image_url_from_webpage(driver, max_number, quiet=False):
             except Exception as e:
                 print("Error while retrying click:", e)
     
-    image_elements = driver.find_elements_by_class_name("islib")
+    image_elements = driver.find_elements(By.CLASS_NAME, "islib")
     image_urls = list()
     url_pattern = r"imgurl=\S*&amp;imgrefurl"
 
@@ -157,13 +158,13 @@ def bing_image_url_from_webpage(driver):
     img_count = 0
 
     while True:
-        image_elements = driver.find_elements_by_class_name("iusc")
+        image_elements = driver.find_elements(By.CLASS_NAME, "iusc")
         if len(image_elements) > img_count:
             img_count = len(image_elements)
             driver.execute_script(
                 "window.scrollTo(0, document.body.scrollHeight);")
         else:
-            smb = driver.find_elements_by_class_name("btn_seemore")
+            smb = driver.find_elements(By.CLASS_NAME, "btn_seemore")
             if len(smb) > 0 and smb[0].is_displayed():
                 smb[0].click()
             else:
@@ -197,7 +198,7 @@ def baidu_gen_query_url(keywords, face_only=False, safe_mode=False, color=None):
 
 def baidu_image_url_from_webpage(driver):
     time.sleep(10)
-    image_elements = driver.find_elements_by_class_name("imgitem")
+    image_elements = driver.find_elements(By.CLASS_NAME, "imgitem")
     image_urls = list()
 
     for image_element in image_elements:

@@ -131,8 +131,8 @@ def download_images(image_urls, dst_dir, file_prefix=None, concurrency=50, timeo
             else:
                 file_name = ''.join([random.choice(string.ascii_letters) for i in range(8)])
             future_list.append(executor.submit(
-                                download_image, image_url, dst_dir, file_name, timeout, proxy_type, proxy, 
-                                format_filter, min_dim))
+                                download_image, image_url, dst_dir, file_name, timeout, 
+                                proxy_type, proxy, format_filter, min_dim))
             count += 1
         concurrent.futures.wait(future_list, timeout=180)
 

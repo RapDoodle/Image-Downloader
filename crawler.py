@@ -298,7 +298,8 @@ def baidu_get_image_url_using_api(keywords, max_number=10000, face_only=False,
 
 def crawl_image_urls(keywords, engine="Google", max_number=10000,
                      face_only=False, safe_mode=False, proxy=None, 
-                     proxy_type="http", quiet=False, browser="phantomjs", image_type=None, color=None):
+                     proxy_type="http", quiet=False, browser="phantomjs", 
+                     image_type=None, color=None):
     """
     Scrape image urls of keywords from Google Image Search
     :param keywords: keywords you want to search
@@ -342,7 +343,7 @@ def crawl_image_urls(keywords, engine="Google", max_number=10000,
 
             # Supress "DevTools listening on ws://127.0.0.1..."
             chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-            
+
             if "headless" in browser:
                 chrome_options.add_argument("headless")
             if proxy is not None and proxy_type is not None:

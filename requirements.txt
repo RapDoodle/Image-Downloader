@@ -3,3 +3,5 @@ PySocks
 requests
 selenium
 PyQt5
+numpy
+opencv-python

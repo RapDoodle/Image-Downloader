@@ -126,10 +126,10 @@ def download_images(image_urls, dst_dir, file_prefix=None, concurrency=50, timeo
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
         for image_url in image_urls:
-            if file_prefix is not None:
-                file_name = file_prefix + "_" + "%04d" % count
+            if file_prefix is None:
+                file_name = f"{''.join([random.choice(string.ascii_letters) for i in range(8)])}_{count}"
             else:
-                file_name = ''.join([random.choice(string.ascii_letters) for i in range(8)])
+                file_name = file_prefix + "_" + "%04d" % count
             future_list.append(executor.submit(
                                 download_image, image_url, dst_dir, file_name, timeout, 
                                 proxy_type, proxy, format_filter, min_dim))

@@ -25,7 +25,7 @@ def get_arg_parser(keywords_required=True):
                             help='Keywords to search. ("in quotes")')
     parser.add_argument("--engine", "-e", type=str, default="Google",
                         help="Image search engine.", choices=["Google", "Bing", "Baidu"])
-    parser.add_argument("--driver", "-d", type=str, default="chrome",
+    parser.add_argument("--driver", "-d", type=str, default="chrome_headless",
                         help="Image search engine.", choices=["chrome_headless", "chrome", "phantomjs"])
     parser.add_argument("--max-number", "-n", type=int, default=100,
                         help="Maximum number of images to download for the keywords.")

@@ -60,6 +60,9 @@ def download_image(image_url, dst_dir, file_name, timeout=20, proxy_type=None,
 
             # Determine the image format
             file_type = imghdr.what(file_path)
+            # Rename .jpeg to .jpg
+            if file_type == 'jpeg':
+                file_type = 'jpg'
             if file_type not in format_filter:
                 os.remove(file_path)
                 return False

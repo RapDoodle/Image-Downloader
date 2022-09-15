@@ -192,7 +192,7 @@ def baidu_gen_query_url(keywords, face_only=False, safe_mode=False, color=None):
         print(color, baidu_color_code[color.lower()])
     if color is not None:
         query_url += "&ic={}".format(baidu_color_code[color.lower()])
-    print(query_url)
+    # print(query_url)
     return query_url
 
 
@@ -249,7 +249,7 @@ def baidu_get_image_url_using_api(keywords, max_number=10000, face_only=False,
     }
 
     res = requests.get(init_url, proxies=proxies, headers=headers)
-    init_json = json.loads(res.text.replace(r"\'", ""), encoding='utf-8', strict=False)
+    init_json = json.loads(res.text.replace(r"\'", ""), strict=False)
     total_num = init_json['listNum']
 
     target_num = min(max_number, total_num)
@@ -276,7 +276,7 @@ def baidu_get_image_url_using_api(keywords, max_number=10000, face_only=False,
                         print(e)
                         return image_urls
             response.encoding = 'utf-8'
-            res_json = json.loads(response.text.replace(r"\'", ""), encoding='utf-8', strict=False)
+            res_json = json.loads(response.text.replace(r"\'", ""), strict=False)
             for data in res_json['data']:
                 if 'objURL' in data.keys():
                     image_urls.append(decode_url(data['objURL']))
@@ -312,6 +312,10 @@ def crawl_image_urls(keywords, engine="Google", max_number=10000,
     :param browser: browser to use when crawl image urls from Google & Bing 
     :return: list of scraped image urls
     """
+
+    # Validate engine name
+    if engine not in ['Google', 'Baidu', 'Bing']:
+        raise Exception(f'Unknown engine name: {engine}')
 
     my_print("\nScraping From {0} Image Search ...\n".format(engine), quiet)
     my_print("Keywords:  " + keywords, quiet)
